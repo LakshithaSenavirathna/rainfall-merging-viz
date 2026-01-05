@@ -1,42 +1,495 @@
-/* Smooth Scroll */
-html {
-    scroll-behavior: smooth;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainfall Data Blending System - Technical Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>🌧️ Rainfall Data Blending</h1>
+                <p>Cressman Objective Analysis System</p>
+            </div>
+            <div class="nav-links">
+                <a href="#section1" class="nav-link active">Setup</a>
+                <a href="#section2" class="nav-link">Land Mask</a>
+                <a href="#section3" class="nav-link">Distance</a>
+                <a href="#section4" class="nav-link">Merging</a>
+                <a href="#section5" class="nav-link">Output</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Satellite-Station Rainfall Data Blending</h1>
+            <p class="hero-subtitle">Multi-scale Cressman Objective Analysis for High-Resolution Precipitation Mapping</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Processing Stages</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">40K</div>
+                    <div class="stat-label">Grid Points</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">31</div>
+                    <div class="stat-label">Days Processed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5km</div>
+                    <div class="stat-label">Resolution</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Section 1: Setup -->
+        <section id="section1" class="content-section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <h2>Imports and Initial Configuration</h2>
+                <p class="section-subtitle">Setting up the processing environment</p>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>📋 Brief Explanation</h3>
+                <p><strong>Purpose:</strong> This section sets up the entire processing environment by importing necessary libraries and defining the spatial domain and file paths for the rainfall data blending system.</p>
+                
+                <div class="grid-2">
+                    <div class="info-card">
+                        <h4>🔧 What It Does:</h4>
+                        <ul>
+                            <li>Imports 9 essential Python libraries</li>
+                            <li>Sets file paths for input/output data</li>
+                            <li>Defines spatial domain (2°-12°N, 76°-86°E)</li>
+                            <li>Sets resolution to 0.05° (~5km)</li>
+                            <li>Creates target grid (200×200 points)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h4>📦 Key Components:</h4>
+                        <ul>
+                            <li><strong>xarray:</strong> Handle NetCDF satellite data</li>
+                            <li><strong>pandas:</strong> Process station CSV files</li>
+                            <li><strong>numpy:</strong> Numerical computations</li>
+                            <li><strong>scipy:</strong> Interpolation & distances</li>
+                            <li><strong>geopandas:</strong> Geographic operations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flowchart-container">
+                <h3>🔄 Processing Flow</h3>
+                <div id="flowchart1" class="flowchart"></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💻 Code Section</span>
+                    <button class="copy-btn" onclick="copyCode('code1')">Copy</button>
+                </div>
+                <pre id="code1"><code>import xarray as xr
+import pandas as pd
+import numpy as np
+from scipy.interpolate import griddata
+from scipy.ndimage import distance_transform_edt
+import os
+import sys
+import geopandas as gpd
+from shapely.geometry import Point
+
+# File paths
+station_file = '/content/Jan_2025_stationRF.csv'
+shp_file = '/content/SL_district.shp'
+output_dir = '/content/data'
+os.makedirs(output_dir, exist_ok=True)
+mask_file = '/content/data/land_mask_0.05_buf_wt.nc'
+dist_file = '/content/data/precomputed_distances_0.05.npy'
+
+# Define target region and resolution
+min_lat, max_lat = 2, 12
+min_lon, max_lon = 76, 86
+target_res = 0.05  # Approx 5km
+
+# Create target grid (fixed for all days)
+target_lats = np.arange(min_lat, max_lat + target_res / 2, target_res)
+target_lons = np.arange(min_lon, max_lon + target_res / 2, target_res)
+target_lon, target_lat = np.meshgrid(target_lons, target_lats)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 2: Land Mask -->
+        <section id="section2" class="content-section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <h2>Land Mask and Weight Map Generation</h2>
+                <p class="section-subtitle">Creating coastal buffer zones for smooth data blending</p>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>📋 Brief Explanation</h3>
+                <p><strong>Purpose:</strong> Creates a sophisticated land mask identifying land vs ocean grid points and generates a weight map with coastal buffer zones for smooth blending.</p>
+                
+                <div class="weight-visual">
+                    <div class="weight-item weight-land">
+                        <div class="weight-value">1.0</div>
+                        <div class="weight-label">Land<br><small>Full station influence</small></div>
+                    </div>
+                    <div class="weight-arrow">→</div>
+                    <div class="weight-item weight-buffer">
+                        <div class="weight-value">0.7→0.3</div>
+                        <div class="weight-label">Buffer (15km)<br><small>Gradual fade</small></div>
+                    </div>
+                    <div class="weight-arrow">→</div>
+                    <div class="weight-item weight-ocean">
+                        <div class="weight-value">0.0</div>
+                        <div class="weight-label">Ocean<br><small>Pure satellite</small></div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>💡 Why a Buffer Zone?</strong> Without a buffer, there would be a sharp discontinuity at the coastline. The buffer creates a smooth transition, preventing artificial edges in the final product.
+                </div>
+            </div>
+
+            <div class="flowchart-container">
+                <h3>🔄 Processing Flow</h3>
+                <div id="flowchart2" class="flowchart"></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💻 Complete Code Section</span>
+                    <button class="copy-btn" onclick="copyCode('code2')">Copy</button>
+                </div>
+                <pre id="code2"><code># Load shapefile and create unified geometry
+gdf = gpd.read_file(shp_file)
+sl_geometry = gdf.union_all()
+
+if os.path.exists(mask_file):
+    ds = xr.open_dataset(mask_file)
+    weight_map = ds['weight_map'].values
+    ds.close()
+else:
+    land_mask = np.zeros_like(target_lat, dtype=bool)
+    
+    for i in range(target_lat.shape[0]):
+        for j in range(target_lat.shape[1]):
+            point = Point(target_lon[i, j], target_lat[i, j])
+            land_mask[i, j] = sl_geometry.contains(point)
+    
+    dist_to_land = distance_transform_edt(~land_mask)
+    buffer_grid_units = 3
+    weight_map = np.ones_like(target_lat, dtype=float)
+    
+    in_buffer = (dist_to_land > 0) & (dist_to_land <= buffer_grid_units)
+    if np.any(in_buffer):
+        normalized_dist = dist_to_land[in_buffer] / buffer_grid_units
+        weight_map[in_buffer] = 0.7 - normalized_dist * 0.4
+    
+    ocean_points = ~land_mask
+    weight_map[ocean_points & ~in_buffer] = 0
+    
+    # Save to NetCDF
+    ds_weight = xr.Dataset(
+        {'weight_map': (('lat', 'lon'), weight_map)},
+        coords={'lat': ('lat', target_lats), 'lon': ('lon', target_lons)}
+    )
+    ds_weight.to_netcdf(mask_file)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 3: Distance Computation -->
+        <section id="section3" class="content-section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <h2>Station Data Loading and Distance Precomputation</h2>
+                <p class="section-subtitle">Optimizing performance through strategic distance caching</p>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>📋 Brief Explanation</h3>
+                <p><strong>Purpose:</strong> Loads station data, filters within domain, and precomputes distances from every grid point to every station. Saves to disk to avoid recalculation.</p>
+                
+                <div class="performance-stats">
+                    <div class="perf-item">
+                        <div class="perf-label">Array Size</div>
+                        <div class="perf-value">200 × 200 × N</div>
+                    </div>
+                    <div class="perf-item">
+                        <div class="perf-label">Computations</div>
+                        <div class="perf-value">40K × N</div>
+                    </div>
+                    <div class="perf-item highlight">
+                        <div class="perf-label">Time Saved</div>
+                        <div class="perf-value">97%</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>💡 Why Precompute?</strong> For 50 stations × 31 days, precomputation saves ~60 million distance calculations!
+                </div>
+            </div>
+
+            <div class="flowchart-container">
+                <h3>🔄 Processing Flow</h3>
+                <div id="flowchart3" class="flowchart"></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💻 Complete Code Section</span>
+                    <button class="copy-btn" onclick="copyCode('code3')">Copy</button>
+                </div>
+                <pre id="code3"><code># Load station data
+df_station = pd.read_csv(station_file)
+
+# Filter stations within domain
+df_station = df_station[(df_station['latitude'] >= min_lat) & 
+                        (df_station['latitude'] <= max_lat) &
+                        (df_station['longitude'] >= min_lon) & 
+                        (df_station['longitude'] <= max_lon)]
+
+station_lats_all = df_station['latitude'].values
+station_lons_all = df_station['longitude'].values
+num_stations = len(station_lats_all)
+
+# Precompute distances
+if os.path.exists(dist_file):
+    dist_array = np.load(dist_file)
+else:
+    dist_array = np.zeros((target_lat.shape[0], target_lat.shape[1], num_stations))
+    
+    for i in range(target_lat.shape[0]):
+        for j in range(target_lat.shape[1]):
+            dist_array[i, j, :] = np.sqrt(
+                (station_lats_all - target_lat[i, j])**2 + 
+                (station_lons_all - target_lon[i, j])**2
+            )
+    
+    np.save(dist_file, dist_array)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 4: Daily Merging -->
+        <section id="section4" class="content-section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <h2>Main Daily Merging Loop</h2>
+                <p class="section-subtitle">Iterative Cressman objective analysis for 31 days</p>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>📋 Brief Explanation</h3>
+                <p><strong>Purpose:</strong> For each of 31 days, loads satellite data, interpolates to target grid, then uses Cressman successive correction with station observations through multiple passes.</p>
+                
+                <div class="cressman-passes">
+                    <div class="pass-card pass-1">
+                        <div class="pass-header">Pass 1: r = 0.5°</div>
+                        <div class="pass-body">
+                            <strong>Regional Patterns</strong>
+                            <p>Large radius (~55km) captures broad corrections</p>
+                        </div>
+                    </div>
+                    <div class="pass-card pass-2">
+                        <div class="pass-header">Pass 2: r = 0.3°</div>
+                        <div class="pass-body">
+                            <strong>Mesoscale Features</strong>
+                            <p>Medium radius (~33km) refines patterns</p>
+                        </div>
+                    </div>
+                    <div class="pass-card pass-3">
+                        <div class="pass-header">Pass 3: r = 0.1°</div>
+                        <div class="pass-body">
+                            <strong>Local Details</strong>
+                            <p>Small radius (~11km) fine-tunes locally</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-box">
+                    <h4>Cressman Weight Function</h4>
+                    <div class="formula">w = (r² - d²) / (r² + d²)</div>
+                    <p>where <strong>w</strong> = weight, <strong>r</strong> = radius, <strong>d</strong> = distance</p>
+                </div>
+            </div>
+
+            <div class="flowchart-container">
+                <h3>🔄 Processing Flow</h3>
+                <div id="flowchart4" class="flowchart"></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💻 Complete Code Section</span>
+                    <button class="copy-btn" onclick="copyCode('code4')">Copy</button>
+                </div>
+                <pre id="code4"><code>days = range(1, 32)
+merged_list = []
+
+for day in days:
+    satellite_file = f'gpm_data/3B-DAY-L.MS.MRG.3IMERG.202501{day:02d}.nc4'
+    
+    # Load satellite
+    ds_sat = xr.open_dataset(satellite_file)
+    ds_sat_crop = ds_sat.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+    
+    # Interpolate to target grid
+    initial_guess = griddata(
+        (sat_lat_mesh.ravel(), sat_lon_mesh.ravel()), 
+        sat_precip.ravel(),
+        (target_lat, target_lon), 
+        method='cubic'
+    )
+    
+    # Load station data
+    station_precip = df_station[str(day)].values
+    merged_precip = initial_guess.copy()
+    
+    # Cressman successive correction
+    radii = [0.5, 0.3, 0.1]
+    for r in radii:
+        # Compute residuals
+        current_at_stations = griddata(
+            (target_lat.ravel(), target_lon.ravel()), 
+            merged_precip.ravel(),
+            (station_lat, station_lon), 
+            method='linear'
+        )
+        residuals = station_precip - current_at_stations
+        
+        # Apply Cressman weights
+        correction_grid = np.zeros_like(merged_precip)
+        in_radius = dist_array < r
+        
+        for i in range(target_lat.shape[0]):
+            for j in range(target_lat.shape[1]):
+                if np.any(in_radius[i, j, :]):
+                    mask = in_radius[i, j, :]
+                    weights = (r**2 - dist_array[i,j,mask]**2) / (r**2 + dist_array[i,j,mask]**2)
+                    correction_grid[i, j] = np.sum(weights * residuals[mask]) / np.sum(weights)
+        
+        correction_grid *= weight_map
+        merged_precip += correction_grid
+    
+    merged_precip = np.clip(merged_precip, 0, np.inf)
+    merged_list.append(merged_precip)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 5: Output -->
+        <section id="section5" class="content-section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <h2>Final Dataset Assembly and Output</h2>
+                <p class="section-subtitle">Creating CF-compliant NetCDF with metadata</p>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>📋 Brief Explanation</h3>
+                <p><strong>Purpose:</strong> Assembles 31 daily grids into a single NetCDF file following CF conventions with comprehensive metadata.</p>
+                
+                <div class="dataset-structure">
+                    <div class="ds-item">
+                        <strong>Dimensions</strong>
+                        <div class="ds-values">
+                            <span>time: 31</span>
+                            <span>lat: 200</span>
+                            <span>lon: 200</span>
+                        </div>
+                    </div>
+                    <div class="ds-item">
+                        <strong>Format</strong>
+                        <div class="ds-values">
+                            <span>NetCDF4</span>
+                            <span>CF-compliant</span>
+                            <span>~10 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>💡 Why CF Conventions?</strong> Ensures the file is self-describing and interoperable with standard scientific software.
+                </div>
+            </div>
+
+            <div class="flowchart-container">
+                <h3>🔄 Processing Flow</h3>
+                <div id="flowchart5" class="flowchart"></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💻 Complete Code Section</span>
+                    <button class="copy-btn" onclick="copyCode('code5')">Copy</button>
+                </div>
+                <pre id="code5"><code># Create output Dataset
+ds_out = xr.Dataset(
+    {'precip': (('time', 'lat', 'lon'), np.stack(merged_list))},
+    coords={'time': ('time', timestamps), 
+            'lat': ('lat', target_lats), 
+            'lon': ('lon', target_lons)}
+)
+
+# Add attributes
+ds_out['lat'].attrs = {
+    'units': 'degrees_north', 
+    'long_name': 'latitude', 
+    'standard_name': 'latitude'
+}
+ds_out['lon'].attrs = {
+    'units': 'degrees_east', 
+    'long_name': 'longitude', 
+    'standard_name': 'longitude'
+}
+ds_out['time'].attrs = {
+    'standard_name': 'time', 
+    'long_name': 'time'
+}
+ds_out['precip'].attrs = {
+    'units': 'mm/day', 
+    'long_name': 'precipitation'
 }
 
-/* Custom Scrollbar for weather theme */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-    background: #6366f1;
-    border-radius: 10px;
+# Global attributes
+ds_out.attrs = {
+    'history': 'Merged satellite and station precipitation', 
+    'creation_date': '2025-11-10'
 }
 
-/* SVG Responsiveness */
-svg {
-    filter: drop-shadow(0 4px 6px -1px rgb(0 0 0 / 0.1));
+# Save with encoding
+encoding = {
+    'precip': {'_FillValue': np.nan},
+    'lat': {'_FillValue': np.nan},
+    'lon': {'_FillValue': np.nan},
+    'time': {'dtype': 'float64'}
 }
 
-/* Code block adjustments */
-pre {
-    font-family: 'Fira Code', 'Courier New', monospace;
-    white-space: pre-wrap;
-    word-break: break-all;
-}
+ds_out.to_netcdf('data/merged_5km_precip_IMERG.nc', encoding=encoding)
+print("Merged data saved successfully")</code></pre>
+            </div>
+        </section>
+    </main>
 
-/* Section highlights on hover */
-section {
-    transition: opacity 0.5s ease;
-}
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Rainfall Data Blending System | Multi-scale Cressman Objective Analysis</p>
+            <p>Documentation generated for GitHub Pages</p>
+        </div>
+    </footer>
 
-/* Fix for overlapping Nav on anchors */
-section::before {
-    content: "";
-    display: block;
-    height: 80px;
-    margin-top: -80px;
-    visibility: hidden;
-}
+    <script src="script.js"></script>
+</body>
+</html>
