@@ -1,0 +1,42 @@
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for weather theme */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 10px;
+}
+
+/* SVG Responsiveness */
+svg {
+    filter: drop-shadow(0 4px 6px -1px rgb(0 0 0 / 0.1));
+}
+
+/* Code block adjustments */
+pre {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Section highlights on hover */
+section {
+    transition: opacity 0.5s ease;
+}
+
+/* Fix for overlapping Nav on anchors */
+section::before {
+    content: "";
+    display: block;
+    height: 80px;
+    margin-top: -80px;
+    visibility: hidden;
+}
