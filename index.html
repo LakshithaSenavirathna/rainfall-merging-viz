@@ -336,37 +336,182 @@ else:
             </div>
 
 
-<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%"> <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:0.9" /> <stop offset="100%" style="stop-color:#bae6fd;stop-opacity:0.9" /> </linearGradient> <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"> <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" /> </marker> </defs>
+<svg viewBox="0 0 800 550"
+     width="100%"
+     height="100%"
+     xmlns="http://www.w3.org/2000/svg">
 
-<text x="350" y="480" font-size="14" font-weight="bold" fill="#475569">Longitude Grid Index (j)</text> <text x="30" y="250" font-size="14" font-weight="bold" fill="#475569" transform="rotate(-90 30,250)">Latitude Grid Index (i)</text> <text x="700" y="250" font-size="14" font-weight="bold" fill="#475569" transform="rotate(90 700,250)">Station Index (k)</text>
+  <defs>
+    <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
 
-<g transform="translate(150, 50)" opacity="0.5"> <rect x="0" y="0" width="400" height="400" fill="#ddd" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/> <text x="200" y="-20" text-anchor="middle" font-weight="bold" fill="#666">Slice k = N-1 (Last Station)</text> </g>
+    <marker id="arrowhead"
+            markerWidth="10"
+            markerHeight="7"
+            refX="9"
+            refY="3.5"
+            orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+  </defs>
 
-<g transform="translate(100, 100)"> <rect x="0" y="0" width="400" height="400" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/> <text x="410" y="200" font-weight="bold" fill="#dc2626">Slice k (Current Station)</text> <circle cx="300" cy="120" r="8" fill="#dc2626" stroke="white" stroke-width="2"/> <text x="315" y="125" font-size="12" font-weight="bold" fill="#dc2626">Station k Location</text> <text x="315" y="140" font-size="10" fill="#dc2626">(station_lats_all[k], station_lons_all[k])</text> </g>
+  <!-- Axis labels -->
+  <text x="320" y="535" font-size="14" font-weight="bold" fill="#475569">
+    Longitude Grid Index (j)
+  </text>
 
-<g transform="translate(50, 150)"> <rect x="0" y="0" width="400" height="400" fill="url(#gridGradient)" stroke="#0369a1" stroke-width="4"/> <text x="200" y="-20" text-anchor="middle" font-weight="bold" fill="#0369a1">Front View: Target Grid (Slice k=0)</text>
+  <text x="20" y="300" font-size="14" font-weight="bold"
+        fill="#475569" transform="rotate(-90 20,300)">
+    Latitude Grid Index (i)
+  </text>
 
- <path d="M 180 50 Q 220 80 230 120 Q 250 180 240 250 Q 220 320 180 350 Q 140 320 120 250 Q 110 180 130 120 Q 140 80 180 50 Z" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.6"/>
+  <text x="780" y="300" font-size="14" font-weight="bold"
+        fill="#475569" transform="rotate(90 780,300)">
+    Station Index (k)
+  </text>
 
- <line x1="50" y1="0" x2="50" y2="400" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="150" y1="0" x2="150" y2="400" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="250" y1="0" x2="250" y2="400" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="350" y1="0" x2="350" y2="400" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="0" y1="50" x2="400" y2="50" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="0" y1="150" x2="400" y2="150" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="0" y1="250" x2="400" y2="250" stroke="#0ea5e9" opacity="0.3"/>
- <line x1="0" y1="350" x2="400" y2="350" stroke="#0ea5e9" opacity="0.3"/>
+  <!-- Back slice -->
+  <g transform="translate(180,60)" opacity="0.4">
+    <rect width="400" height="400"
+          fill="#e5e7eb"
+          stroke="#9ca3af"
+          stroke-width="2"
+          stroke-dasharray="6,6"/>
+    <text x="200" y="-10" text-anchor="middle"
+          font-weight="bold" fill="#6b7280">
+      Slice k = N − 1
+    </text>
+  </g>
 
- <circle cx="150" cy="250" r="8" fill="#0369a1" stroke="white" stroke-width="2"/>
- <text x="165" y="255" font-size="12" font-weight="bold" fill="#0369a1">Grid Point (i, j)</text>
- <text x="165" y="270" font-size="10" fill="#0369a1">(target_lat[i,j], target_lon[i,j])</text>
-</g>
+  <!-- Current slice -->
+  <g transform="translate(120,110)">
+    <rect width="400" height="400"
+          fill="#cbd5e1"
+          stroke="#64748b"
+          stroke-width="3"/>
 
-<line x1="50" y1="150" x2="200" y2="50" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="450" y1="150" x2="600" y2="50" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="450" y1="550" x2="600" y2="450" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="200" y1="400" x2="400" y2="220" stroke="#dc2626" stroke-width="4" marker-end="url(#arrowhead)"/>
+    <text x="415" y="200" font-weight="bold" fill="#dc2626">
+      Slice k (Current Station)
+    </text>
 
-<rect x="260" y="280" width="180" height="60" fill="white" stroke="#dc2626" rx="5"/> <text x="350" y="305" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">Calculation at dist_array[i, j, k]</text> <text x="350" y="325" text-anchor="middle" font-size="10" font-style="italic" fill="#333">sqrt((lat_st - lat_grid)² + (lon_st - lon_grid)²)</text>
+    <circle cx="300" cy="120" r="9"
+            fill="#dc2626"
+            stroke="white"
+            stroke-width="2"/>
+
+    <rect x="320" y="95" width="160" height="42" fill="white" rx="5"/>
+    <text x="400" y="113" font-size="11"
+          text-anchor="middle"
+          font-weight="bold" fill="#dc2626">
+      Station k Location
+    </text>
+    <text x="400" y="128" font-size="10"
+          text-anchor="middle"
+          fill="#374151">
+      (station_lat[k], station_lon[k])
+    </text>
+  </g>
+
+  <!-- FRONT VIEW GRID (MAIN FIX) -->
+  <g transform="translate(60,160)">
+
+    <rect width="400" height="400"
+          fill="url(#gridGradient)"
+          stroke="#0369a1"
+          stroke-width="4"/>
+
+    <text x="200" y="-10"
+          text-anchor="middle"
+          font-weight="bold"
+          fill="#0369a1">
+      Front View: Target Grid (k = 0)
+    </text>
+
+    <!-- Grid lines -->
+    <g stroke="#0ea5e9" stroke-width="1" opacity="0.25">
+      <line x1="50" y1="0" x2="50" y2="400"/>
+      <line x1="150" y1="0" x2="150" y2="400"/>
+      <line x1="250" y1="0" x2="250" y2="400"/>
+      <line x1="350" y1="0" x2="350" y2="400"/>
+
+      <line x1="0" y1="50" x2="400" y2="50"/>
+      <line x1="0" y1="150" x2="400" y2="150"/>
+      <line x1="0" y1="250" x2="400" y2="250"/>
+      <line x1="0" y1="350" x2="400" y2="350"/>
+    </g>
+
+    <!-- 🇱🇰 SRI LANKA SHAPE (CLEAR & VISIBLE) -->
+    <path
+      d="M 200 35
+         C 260 95, 280 160, 265 230
+         C 255 315, 215 370, 200 390
+         C 185 370, 145 315, 135 230
+         C 120 160, 140 95, 200 35 Z"
+      fill="rgba(2,132,199,0.5)"
+      stroke="#0c4a6e"
+      stroke-width="5"
+      stroke-linejoin="round"/>
+
+    <!-- Grid point -->
+    <circle cx="150" cy="250" r="9"
+            fill="#0369a1"
+            stroke="white"
+            stroke-width="2"/>
+
+    <rect x="165" y="228" width="170" height="45" fill="white" rx="5"/>
+    <text x="250" y="247" text-anchor="middle"
+          font-size="11"
+          font-weight="bold"
+          fill="#0369a1">
+      Grid Point (i, j)
+    </text>
+    <text x="250" y="262" text-anchor="middle"
+          font-size="10"
+          fill="#374151">
+      (target_lat[i,j], target_lon[i,j])
+    </text>
+
+  </g>
+
+  <!-- Connecting lines -->
+  <line x1="260" y1="160" x2="320" y2="110"
+        stroke="#64748b" stroke-width="2"
+        stroke-dasharray="5,5"/>
+
+  <line x1="460" y1="160" x2="620" y2="90"
+        stroke="#64748b" stroke-width="2"
+        stroke-dasharray="5,5"/>
+
+  <line x1="260" y1="520" x2="460" y2="330"
+        stroke="#dc2626"
+        stroke-width="4"
+        marker-end="url(#arrowhead)"/>
+
+  <!-- Calculation box -->
+  <rect x="460" y="310" width="240" height="75"
+        fill="white"
+        stroke="#dc2626"
+        rx="6"/>
+
+  <text x="580" y="335"
+        text-anchor="middle"
+        font-size="11"
+        font-weight="bold"
+        fill="#dc2626">
+    Calculation at dist_array[i, j, k]
+  </text>
+
+  <text x="580" y="358"
+        text-anchor="middle"
+        font-size="10"
+        fill="#374151">
+    √((latₛ − latᵢⱼ)² + (lonₛ − lonᵢⱼ)²)
+  </text>
 
 </svg>
+
             
             
             <div class="explanation-box">
@@ -735,6 +880,7 @@ print("Merged data saved successfully")</code></pre>
     </script>
 </body>
 </html>
+
 
 
 
