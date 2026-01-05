@@ -334,6 +334,40 @@ else:
                 <h2>Station Data Loading and Distance Precomputation</h2>
                 <p class="section-subtitle">Optimizing performance through strategic distance caching</p>
             </div>
+
+
+<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%"> <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:0.9" /> <stop offset="100%" style="stop-color:#bae6fd;stop-opacity:0.9" /> </linearGradient> <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"> <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" /> </marker> </defs>
+
+<text x="350" y="480" font-size="14" font-weight="bold" fill="#475569">Longitude Grid Index (j)</text> <text x="30" y="250" font-size="14" font-weight="bold" fill="#475569" transform="rotate(-90 30,250)">Latitude Grid Index (i)</text> <text x="700" y="250" font-size="14" font-weight="bold" fill="#475569" transform="rotate(90 700,250)">Station Index (k)</text>
+
+<g transform="translate(150, 50)" opacity="0.5"> <rect x="0" y="0" width="400" height="400" fill="#ddd" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/> <text x="200" y="-20" text-anchor="middle" font-weight="bold" fill="#666">Slice k = N-1 (Last Station)</text> </g>
+
+<g transform="translate(100, 100)"> <rect x="0" y="0" width="400" height="400" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/> <text x="410" y="200" font-weight="bold" fill="#dc2626">Slice k (Current Station)</text> <circle cx="300" cy="120" r="8" fill="#dc2626" stroke="white" stroke-width="2"/> <text x="315" y="125" font-size="12" font-weight="bold" fill="#dc2626">Station k Location</text> <text x="315" y="140" font-size="10" fill="#dc2626">(station_lats_all[k], station_lons_all[k])</text> </g>
+
+<g transform="translate(50, 150)"> <rect x="0" y="0" width="400" height="400" fill="url(#gridGradient)" stroke="#0369a1" stroke-width="4"/> <text x="200" y="-20" text-anchor="middle" font-weight="bold" fill="#0369a1">Front View: Target Grid (Slice k=0)</text>
+
+ <path d="M 180 50 Q 220 80 230 120 Q 250 180 240 250 Q 220 320 180 350 Q 140 320 120 250 Q 110 180 130 120 Q 140 80 180 50 Z" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.6"/>
+
+ <line x1="50" y1="0" x2="50" y2="400" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="150" y1="0" x2="150" y2="400" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="250" y1="0" x2="250" y2="400" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="350" y1="0" x2="350" y2="400" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="0" y1="50" x2="400" y2="50" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="0" y1="150" x2="400" y2="150" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="0" y1="250" x2="400" y2="250" stroke="#0ea5e9" opacity="0.3"/>
+ <line x1="0" y1="350" x2="400" y2="350" stroke="#0ea5e9" opacity="0.3"/>
+
+ <circle cx="150" cy="250" r="8" fill="#0369a1" stroke="white" stroke-width="2"/>
+ <text x="165" y="255" font-size="12" font-weight="bold" fill="#0369a1">Grid Point (i, j)</text>
+ <text x="165" y="270" font-size="10" fill="#0369a1">(target_lat[i,j], target_lon[i,j])</text>
+</g>
+
+<line x1="50" y1="150" x2="200" y2="50" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="450" y1="150" x2="600" y2="50" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="450" y1="550" x2="600" y2="450" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5"/> <line x1="200" y1="400" x2="400" y2="220" stroke="#dc2626" stroke-width="4" marker-end="url(#arrowhead)"/>
+
+<rect x="260" y="280" width="180" height="60" fill="white" stroke="#dc2626" rx="5"/> <text x="350" y="305" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">Calculation at dist_array[i, j, k]</text> <text x="350" y="325" text-anchor="middle" font-size="10" font-style="italic" fill="#333">sqrt((lat_st - lat_grid)² + (lon_st - lon_grid)²)</text>
+
+</svg>
+            
             
             <div class="explanation-box">
                 <h3>📋 Brief Explanation</h3>
@@ -701,6 +735,7 @@ print("Merged data saved successfully")</code></pre>
     </script>
 </body>
 </html>
+
 
 
 
